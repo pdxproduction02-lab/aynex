@@ -1,5 +1,24 @@
 import { useState } from "react";
-import { Settings, Plus, ArrowUp } from "lucide-react";
+import {
+  Settings,
+  Plus,
+  ArrowUp,
+  Sparkles,
+  Lightbulb,
+  Compass,
+} from "lucide-react";
+
+function AynexMark({ small = false }) {
+  return (
+    <div className={`aynex-mark ${small ? "small" : ""}`}>
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M14 47L32 13L50 47" />
+        <path d="M21 36H43" />
+        <path d="M24 47L32 36L40 47" />
+      </svg>
+    </div>
+  );
+}
 
 function App() {
   const [input, setInput] = useState("");
@@ -15,13 +34,15 @@ function App() {
 
   return (
     <div className="app">
+      <div className="ambient-glow" />
+
       <header className="topbar">
         <div className="brand">
-          <div className="brand-mark">A</div>
+          <AynexMark small />
 
-          <div>
+          <div className="brand-copy">
             <div className="brand-name">AYNEX</div>
-            <div className="brand-status">AI INTELLIGENCE</div>
+            <div className="brand-tagline">THINK BEYOND</div>
           </div>
         </div>
 
@@ -38,15 +59,39 @@ function App() {
 
       <main className="chat-area">
         <section className="welcome">
-          <div className="welcome-mark">A</div>
+          <AynexMark />
 
-          <h1>Hello, I'm AYNEX.</h1>
+          <div className="eyebrow">
+            <Sparkles size={13} />
+            <span>INTELLIGENCE, REIMAGINED</span>
+          </div>
+
+          <h1>
+            Think <span>beyond.</span>
+          </h1>
 
           <p>
-            An intelligent AI system designed to think,
+            Ask questions, explore ideas, and create
             <br />
-            create, and assist.
+            something extraordinary.
           </p>
+
+          <div className="quick-actions">
+            <button type="button">
+              <Compass size={15} />
+              Explore
+            </button>
+
+            <button type="button">
+              <Sparkles size={15} />
+              Create
+            </button>
+
+            <button type="button">
+              <Lightbulb size={15} />
+              Ask
+            </button>
+          </div>
         </section>
       </main>
 
@@ -56,7 +101,7 @@ function App() {
             type="text"
             value={input}
             onChange={(event) => setInput(event.target.value)}
-            placeholder="Ask AYNEX anything..."
+            placeholder="Message AYNEX..."
             aria-label="Message AYNEX"
           />
 
@@ -70,7 +115,7 @@ function App() {
         </form>
 
         <div className="composer-note">
-          AYNEX can make mistakes. Verify important information.
+          AYNEX may make mistakes. Verify important information.
         </div>
       </div>
     </div>
