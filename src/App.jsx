@@ -6,6 +6,8 @@ import {
   Sparkles,
   Lightbulb,
   Compass,
+  Copy,
+  Check,
 } from "lucide-react";
 
 function AynexMark({ small = false }) {
@@ -20,11 +22,197 @@ function AynexMark({ small = false }) {
   );
 }
 
+/* ---------- Inline Markdown ---------- */
+
+function renderInlineMarkdown(text) {
+  const parts = text.split(
+    /(`[^`]+`|\*\*[^*]+\*\*|__[^_]+__|\*[^*]+\*|_[^_]+_)/
+  );
+
+  return parts.map((part, index) => {
+    if (part.startsWith("`") && part.endsWith("`")) {
+      return (
+        <code key={index}>
+          {part.slice(1, -1)}
+        </code>
+      );
+    }
+
+    if (
+      (part.startsWith("**") && part.endsWith("**")) ||
+      (part.startsWith("__") && part.endsWith("__"))
+    ) {
+      return (
+        <strong key={index}>
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+
+    if (
+      part.startsWith("*") &&
+      part.endsWith("*") &&
+      !part.startsWith("**")
+    ) {
+      return (
+        <em key={index}>
+          {part.slice(1, -1)}
+        </em>
+      );
+    }
+
+    if (
+      part.startsWith("_") &&
+      part.endsWith("_") &&
+      !part.startsWith("__")
+    ) {
+      return (
+        <em key={index}>
+          {part.slice(1, -1)}
+        </em>
+      );
+    }
+
+    return <span key={index}>{part}</span>;
+  });
+}
+
+/* ---------- Markdown Renderer ---------- */
+
+function MarkdownContent({ content }) {
+  const lines = content.split("\n");
+  const elements = [];
+
+  let currentList = [];
+  let listType = null;
+
+  const flushList = () => {
+    if (currentList.length === 0) return;
+
+    const ListTag = listType === "number" ? "ol" : "ul";
+
+    elements.push(
+      <ListTag key={`list-${elements.length}`}>
+        {currentList.map((item, index) => (
+          <li key={index}>
+            {renderInlineMarkdown(item)}
+          </li>
+        ))}
+      </ListTag>
+    );
+
+    currentList = [];
+    listType = null;
+  };
+
+  lines.forEach((line, index) => {
+    const trimmed = line.trim();
+
+    if (!trimmed) {
+      flushList();
+      return;
+    }
+
+    const headingMatch = trimmed.match(/^(#{1,3})\s+(.+)$/);
+
+    if (headingMatch) {
+      flushList();
+
+      const level = headingMatch[1].length;
+      const HeadingTag = `h${level}`;
+
+      elements.push(
+        <HeadingTag key={index}>
+          {renderInlineMarkdown(headingMatch[2])}
+        </HeadingTag>
+      );
+
+      return;
+    }
+
+    const bulletMatch = trimmed.match(/^[-*]\s+(.+)$/);
+
+    if (bulletMatch) {
+      if (listType !== "bullet") {
+        flushList();
+        listType = "bullet";
+      }
+
+      currentList.push(bulletMatch[1]);
+      return;
+    }
+
+    const numberedMatch = trimmed.match(/^\d+\.\s+(.+)$/);
+
+    if (numberedMatch) {
+      if (listType !== "number") {
+        flushList();
+        listType = "number";
+      }
+
+      currentList.push(numberedMatch[1]);
+      return;
+    }
+
+    flushList();
+
+    elements.push(
+      <p key={index}>
+        {renderInlineMarkdown(trimmed)}
+      </p>
+    );
+  });
+
+  flushList();
+
+  return <div className="markdown-content">{elements}</div>;
+}
+
+/* ---------- Typing Effect ---------- */
+
+function TypingMessage({ content }) {
+  const [visibleText, setVisibleText] = useState("");
+  const [isFinished, setIsFinished] = useState(false);
+
+  useEffect(() => {
+    setVisibleText("");
+    setIsFinished(false);
+
+    let index = 0;
+
+    const interval = setInterval(() => {
+      index += 1;
+
+      setVisibleText(content.slice(0, index));
+
+      if (index >= content.length) {
+        clearInterval(interval);
+        setIsFinished(true);
+      }
+    }, 12);
+
+    return () => clearInterval(interval);
+  }, [content]);
+
+  return (
+    <>
+      <MarkdownContent content={visibleText} />
+
+      {!isFinished && (
+        <span className="typing-cursor" />
+      )}
+    </>
+  );
+}
+
+/* ---------- Main App ---------- */
+
 function App() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [isThinking, setIsThinking] = useState(false);
   const [error, setError] = useState("");
+  const [copiedIndex, setCopiedIndex] = useState(null);
 
   const chatEndRef = useRef(null);
 
@@ -96,6 +284,21 @@ function App() {
     setMessages([]);
     setInput("");
     setError("");
+    setCopiedIndex(null);
+  };
+
+  const copyAnswer = async (content, index) => {
+    try {
+      await navigator.clipboard.writeText(content);
+
+      setCopiedIndex(index);
+
+      setTimeout(() => {
+        setCopiedIndex(null);
+      }, 1800);
+    } catch (err) {
+      console.error("Copy failed:", err);
+    }
   };
 
   return (
@@ -152,17 +355,32 @@ function App() {
             </p>
 
             <div className="quick-actions">
-              <button type="button" onClick={() => setInput("Explore an interesting topic")}>
+              <button
+                type="button"
+                onClick={() =>
+                  setInput("Explore an interesting topic")
+                }
+              >
                 <Compass size={15} />
                 Explore
               </button>
 
-              <button type="button" onClick={() => setInput("Help me create something")}>
+              <button
+                type="button"
+                onClick={() =>
+                  setInput("Help me create something")
+                }
+              >
                 <Sparkles size={15} />
                 Create
               </button>
 
-              <button type="button" onClick={() => setInput("What can you help me with?")}>
+              <button
+                type="button"
+                onClick={() =>
+                  setInput("What can you help me with?")
+                }
+              >
                 <Lightbulb size={15} />
                 Ask
               </button>
@@ -189,8 +407,34 @@ function App() {
                   </div>
 
                   <div className="message-text">
-                    {message.content}
+                    {message.role === "user" ? (
+                      <p>{message.content}</p>
+                    ) : (
+                      <TypingMessage content={message.content} />
+                    )}
                   </div>
+
+                  {message.role === "model" && (
+                    <button
+                      className="copy-button"
+                      type="button"
+                      onClick={() =>
+                        copyAnswer(message.content, index)
+                      }
+                    >
+                      {copiedIndex === index ? (
+                        <>
+                          <Check size={14} />
+                          Copied
+                        </>
+                      ) : (
+                        <>
+                          <Copy size={14} />
+                          Copy
+                        </>
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
