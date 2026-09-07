@@ -9,6 +9,33 @@ import {
   Copy,
   Check,
 } from "lucide-react";
+const STORAGE_KEY = "aynex_conversations";
+
+function loadConversations() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+
+    if (!saved) return [];
+
+    const parsed = JSON.parse(saved);
+
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    console.error("Failed to load conversations:", error);
+    return [];
+  }
+}
+
+function saveConversations(conversations) {
+  try {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(conversations)
+    );
+  } catch (error) {
+    console.error("Failed to save conversations:", error);
+  }
+}
 
 function AynexMark({ small = false }) {
   return (
