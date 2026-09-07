@@ -236,10 +236,14 @@ function TypingMessage({ content }) {
 
 function App() {
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState([]);
-  const [isThinking, setIsThinking] = useState(false);
-  const [error, setError] = useState("");
-  const [copiedIndex, setCopiedIndex] = useState(null);
+const [messages, setMessages] = useState([]);
+const [conversations, setConversations] = useState(() => {
+  return loadConversations();
+});
+const [activeConversationId, setActiveConversationId] = useState(null);
+const [isThinking, setIsThinking] = useState(false);
+const [error, setError] = useState("");
+const [copiedIndex, setCopiedIndex] = useState(null);
 
   const chatEndRef = useRef(null);
 
