@@ -282,39 +282,51 @@ useEffect(() => {
     return updatedConversations;
   });
 }, [messages, activeConversationId]);
-  const updatedMessages = [...messages, userMessage];
+    const sendMessage = async (event) => {
+    event.preventDefault();
 
-let conversationId = activeConversationId;
+    const text = input.trim();
 
-if (!conversationId) {
-  conversationId = crypto.randomUUID();
+    if (!text || isThinking) return;
 
-  const newConversation = {
-    id: conversationId,
-    title: text.slice(0, 40),
-    messages: updatedMessages,
-    createdAt: Date.now(),
-    updatedAt: Date.now(),
-  };
+    const userMessage = {
+      role: "user",
+      content: text,
+    };
 
-  setConversations((currentConversations) => {
-    const updatedConversations = [
-      newConversation,
-      ...currentConversations,
-    ];
+    const updatedMessages = [...messages, userMessage];
 
-    saveConversations(updatedConversations);
+    let conversationId = activeConversationId;
 
-    return updatedConversations;
-  });
+    if (!conversationId) {
+      conversationId = crypto.randomUUID();
 
-  setActiveConversationId(conversationId);
-}
+      const newConversation = {
+        id: conversationId,
+        title: text.slice(0, 40),
+        messages: updatedMessages,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      };
 
-setMessages(updatedMessages);
-setInput("");
-setError("");
-setIsThinking(true);
+      setConversations((currentConversations) => {
+        const updatedConversations = [
+          newConversation,
+          ...currentConversations,
+        ];
+
+        saveConversations(updatedConversations);
+
+        return updatedConversations;
+      });
+
+      setActiveConversationId(conversationId);
+    }
+
+    setMessages(updatedMessages);
+    setInput("");
+    setError("");
+    setIsThinking(true);
 
     try {
       const response = await fetch("/api/chat", {
@@ -338,14 +350,14 @@ setIsThinking(true);
       }
 
       const finalMessages = [
-  ...updatedMessages,
-  {
-    role: "model",
-    content: data.message,
-  },
-];
+        ...updatedMessages,
+        {
+          role: "model",
+          content: data.message,
+        },
+      ];
 
-setMessages(finalMessages);
+      setMessages(finalMessages);
     } catch (err) {
       console.error("AYNEX chat error:", err);
 
