@@ -247,30 +247,74 @@ const [copiedIndex, setCopiedIndex] = useState(null);
 
   const chatEndRef = useRef(null);
 
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({
-      behavior: "smooth",
-    });
-  }, [messages, isThinking]);
+useEffect(() => {
+  chatEndRef.current?.scrollIntoView({
+    behavior: "smooth",
+  });
+}, [messages, isThinking]);
 
-  const sendMessage = async (event) => {
-    event.preventDefault();
+useEffect(() => {
+  if (conversations.length === 0) return;
 
-    const text = input.trim();
+  const latestConversation = conversations[0];
 
-    if (!text || isThinking) return;
+  setActiveConversationId(latestConversation.id);
+  setMessages(latestConversation.messages || []);
+}, []);
 
-    const userMessage = {
-      role: "user",
-      content: text,
-    };
+useEffect(() => {
+  if (!activeConversationId || messages.length === 0) return;
 
-    const updatedMessages = [...messages, userMessage];
+  setConversations((currentConversations) => {
+    const updatedConversations = currentConversations.map(
+      (conversation) =>
+        conversation.id === activeConversationId
+          ? {
+              ...conversation,
+              messages,
+              updatedAt: Date.now(),
+            }
+          : conversation
+    );
 
-    setMessages(updatedMessages);
-    setInput("");
-    setError("");
-    setIsThinking(true);
+    saveConversations(updatedConversations);
+
+    return updatedConversations;
+  });
+}, [messages, activeConversationId]);
+  const updatedMessages = [...messages, userMessage];
+
+let conversationId = activeConversationId;
+
+if (!conversationId) {
+  conversationId = crypto.randomUUID();
+
+  const newConversation = {
+    id: conversationId,
+    title: text.slice(0, 40),
+    messages: updatedMessages,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  };
+
+  setConversations((currentConversations) => {
+    const updatedConversations = [
+      newConversation,
+      ...currentConversations,
+    ];
+
+    saveConversations(updatedConversations);
+
+    return updatedConversations;
+  });
+
+  setActiveConversationId(conversationId);
+}
+
+setMessages(updatedMessages);
+setInput("");
+setError("");
+setIsThinking(true);
 
     try {
       const response = await fetch("/api/chat", {
@@ -293,13 +337,15 @@ const [copiedIndex, setCopiedIndex] = useState(null);
         throw new Error("The AI returned an empty response.");
       }
 
-      setMessages([
-        ...updatedMessages,
-        {
-          role: "model",
-          content: data.message,
-        },
-      ]);
+      const finalMessages = [
+  ...updatedMessages,
+  {
+    role: "model",
+    content: data.message,
+  },
+];
+
+setMessages(finalMessages);
     } catch (err) {
       console.error("AYNEX chat error:", err);
 
@@ -312,11 +358,31 @@ const [copiedIndex, setCopiedIndex] = useState(null);
   };
 
   const startNewChat = () => {
-    setMessages([]);
-    setInput("");
-    setError("");
-    setCopiedIndex(null);
+  const newConversation = {
+    id: crypto.randomUUID(),
+    title: "New Chat",
+    messages: [],
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
   };
+
+  setConversations((currentConversations) => {
+    const updatedConversations = [
+      newConversation,
+      ...currentConversations,
+    ];
+
+    saveConversations(updatedConversations);
+
+    return updatedConversations;
+  });
+
+  setActiveConversationId(newConversation.id);
+  setMessages([]);
+  setInput("");
+  setError("");
+  setCopiedIndex(null);
+};
 
   const copyAnswer = async (content, index) => {
     try {
