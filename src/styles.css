@@ -520,3 +520,220 @@ button {
     font-size: 9px;
   }
   }
+/* ───────── Conversation ───────── */
+
+.messages {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 0 40px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.message-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+
+  animation: messageIn 0.3s ease both;
+}
+
+.message-avatar {
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 10px;
+
+  color: #aaa4b2;
+  background: rgba(255, 255, 255, 0.045);
+
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.message-row.model .message-avatar {
+  color: #a78bfa;
+  background: rgba(139, 92, 246, 0.1);
+
+  border: 1px solid rgba(139, 92, 246, 0.18);
+}
+
+.message-avatar .aynex-mark {
+  width: 32px;
+  height: 32px;
+  margin: 0;
+
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.message-avatar .aynex-mark::before {
+  display: none;
+}
+
+.message-avatar .aynex-mark svg {
+  width: 21px;
+  height: 21px;
+}
+
+.message-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.message-label {
+  margin: 2px 0 8px;
+
+  color: #625d68;
+
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.message-row.model .message-label {
+  color: #8b5cf6;
+}
+
+.message-text {
+  color: #d8d3df;
+
+  font-size: 15px;
+  line-height: 1.75;
+
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.message-row.user .message-text {
+  color: #eeeaf2;
+}
+
+/* ───────── Thinking ───────── */
+
+.thinking {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  height: 24px;
+}
+
+.thinking span {
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background: #8b5cf6;
+
+  animation: thinkingPulse 1.2s ease-in-out infinite;
+}
+
+.thinking span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.thinking span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes thinkingPulse {
+  0%,
+  60%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+
+  30% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+/* ───────── Error ───────── */
+
+.chat-error {
+  margin-left: 45px;
+  padding: 12px 14px;
+
+  border: 1px solid rgba(239, 68, 68, 0.18);
+  border-radius: 12px;
+
+  color: #c98d8d;
+  background: rgba(239, 68, 68, 0.045);
+
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ───────── Composer states ───────── */
+
+.send-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+  transform: none;
+  box-shadow: none;
+}
+
+.composer input:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+/* ───────── Message animation ───────── */
+
+@keyframes messageIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ───────── Conversation mobile ───────── */
+
+@media (max-width: 600px) {
+  .messages {
+    padding: 20px 0 30px;
+    gap: 24px;
+  }
+
+  .message-row {
+    gap: 10px;
+  }
+
+  .message-avatar {
+    width: 29px;
+    min-width: 29px;
+    height: 29px;
+    border-radius: 9px;
+  }
+
+  .message-text {
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .message-label {
+    margin-bottom: 6px;
+  }
+
+  .chat-error {
+    margin-left: 39px;
+  }
+  }
