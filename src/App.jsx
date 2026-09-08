@@ -6,8 +6,10 @@ import {
   Sparkles,
   Lightbulb,
   Compass,
-  Copy,
+    Copy,
   Check,
+  Clock3,
+  X,
 } from "lucide-react";
 const STORAGE_KEY = "aynex_conversations";
 
@@ -241,6 +243,7 @@ const [conversations, setConversations] = useState(() => {
   return loadConversations();
 });
 const [activeConversationId, setActiveConversationId] = useState(null);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 const [isThinking, setIsThinking] = useState(false);
 const [error, setError] = useState("");
 const [copiedIndex, setCopiedIndex] = useState(null);
@@ -412,7 +415,53 @@ useEffect(() => {
 
   return (
     <div className="app">
-      <div className="ambient-glow" />
+      <div className="ambient-glow" />{isHistoryOpen && (
+  <div className="history-overlay">
+    <aside className="history-panel">
+      <div className="history-header">
+        <div>
+          <div className="history-eyebrow">YOUR SPACE</div>
+          <h2>Conversation history</h2>
+        </div>
+
+        <button
+          className="history-close"
+          type="button"
+          aria-label="Close history"
+          onClick={() => setIsHistoryOpen(false)}
+        >
+          <X size={18} />
+        </button>
+      </div>
+
+      <div className="history-list">
+        {conversations.length === 0 ? (
+          <div className="history-empty">
+            <Clock3 size={22} />
+            <p>No conversations yet.</p>
+            <span>Your saved chats will appear here.</span>
+          </div>
+        ) : (
+          conversations.map((conversation) => (
+            <button
+              className="history-item"
+              type="button"
+              key={conversation.id}
+            >
+              <div className="history-item-title">
+                {conversation.title || "Untitled conversation"}
+              </div>
+
+              <div className="history-item-meta">
+                {conversation.messages?.length || 0} messages
+              </div>
+            </button>
+          ))
+        )}
+      </div>
+    </aside>
+  </div>
+)}
 
       <header className="topbar">
         <div className="brand">
@@ -425,22 +474,31 @@ useEffect(() => {
         </div>
 
         <div className="topbar-actions">
-          <button
-            className="icon-button"
-            aria-label="New chat"
-            onClick={startNewChat}
-          >
-            <Plus size={19} />
-          </button>
+  <button
+    className="icon-button"
+    aria-label="New chat"
+    onClick={startNewChat}
+  >
+    <Plus size={19} />
+  </button>
 
-          <button
-            className="icon-button"
-            aria-label="Settings"
-            type="button"
-          >
-            <Settings size={19} />
-          </button>
-        </div>
+  <button
+    className="icon-button"
+    aria-label="Conversation history"
+    type="button"
+    onClick={() => setIsHistoryOpen(true)}
+  >
+    <Clock3 size={19} />
+  </button>
+
+  <button
+    className="icon-button"
+    aria-label="Settings"
+    type="button"
+  >
+    <Settings size={19} />
+  </button>
+</div>
       </header>
 
       <main className="chat-area">
