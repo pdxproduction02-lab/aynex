@@ -9,6 +9,7 @@ import {
     Copy,
   Check,
   Clock3,
+  Trash2,
   X,
 } from "lucide-react";
 const STORAGE_KEY = "aynex_conversations";
@@ -371,7 +372,33 @@ useEffect(() => {
       setIsThinking(false);
     }
   };
+const openConversation = (conversation) => {
+  setActiveConversationId(conversation.id);
+  setMessages(conversation.messages || []);
+  setInput("");
+  setError("");
+  setCopiedIndex(null);
+  setIsHistoryOpen(false);
+};
+  const deleteConversation = (conversationId) => {
+  setConversations((currentConversations) => {
+    const updatedConversations = currentConversations.filter(
+      (conversation) => conversation.id !== conversationId
+    );
 
+    saveConversations(updatedConversations);
+
+    return updatedConversations;
+  });
+
+  if (activeConversationId === conversationId) {
+    setActiveConversationId(null);
+    setMessages([]);
+    setInput("");
+    setError("");
+    setCopiedIndex(null);
+  }
+};
   const startNewChat = () => {
   const newConversation = {
     id: crypto.randomUUID(),
@@ -443,20 +470,38 @@ useEffect(() => {
           </div>
         ) : (
           conversations.map((conversation) => (
-            <button
-              className="history-item"
-              type="button"
-              key={conversation.id}
-            >
-              <div className="history-item-title">
-                {conversation.title || "Untitled conversation"}
-              </div>
+  <div
+    className={`history-item ${
+      activeConversationId === conversation.id ? "active" : ""
+    }`}
+    key={conversation.id}
+  >
+    <button
+      className="history-item-main"
+      type="button"
+      onClick={() => openConversation(conversation)}
+    >
+      <div className="history-item-title">
+        {conversation.title || "Untitled conversation"}
+      </div>
 
-              <div className="history-item-meta">
-                {conversation.messages?.length || 0} messages
-              </div>
-            </button>
-          ))
+      <div className="history-item-meta">
+        {conversation.messages?.length || 0} messages
+      </div>
+    </button>
+
+    <button
+      className="history-delete"
+      type="button"
+      aria-label={`Delete ${
+        conversation.title || "conversation"
+      }`}
+      onClick={() => deleteConversation(conversation.id)}
+    >
+      <Trash2 size={15} />
+    </button>
+  </div>
+))
         )}
       </div>
     </aside>
