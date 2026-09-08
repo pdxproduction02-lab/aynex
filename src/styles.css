@@ -1050,3 +1050,164 @@ button {
     margin-left: 41px;
   }
 }
+/* =========================================
+   CONVERSATION HISTORY — 5B.1
+========================================= */
+
+.history-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: flex-end;
+  animation: historyOverlayIn 0.2s ease;
+}
+
+.history-panel {
+  width: min(390px, 100%);
+  height: 100%;
+  background: #0d0b14;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: -20px 0 70px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  animation: historyPanelIn 0.25s ease;
+}
+
+.history-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 28px 24px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.history-eyebrow {
+  color: #9b8cff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  margin-bottom: 8px;
+}
+
+.history-header h2 {
+  margin: 0;
+  color: #f4f1ff;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.history-close {
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.035);
+  color: #aaa3bd;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.history-close:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.history-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 14px;
+}
+
+.history-empty {
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #777184;
+}
+
+.history-empty svg {
+  margin-bottom: 14px;
+  color: #7566c9;
+}
+
+.history-empty p {
+  margin: 0 0 6px;
+  color: #c4bdd5;
+  font-size: 14px;
+}
+
+.history-empty span {
+  font-size: 12px;
+  color: #686174;
+}
+
+.history-item {
+  width: 100%;
+  display: block;
+  text-align: left;
+  padding: 15px 16px;
+  margin-bottom: 8px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.history-item:hover {
+  background: rgba(255, 255, 255, 0.045);
+  border-color: rgba(255, 255, 255, 0.07);
+}
+
+.history-item-title {
+  overflow: hidden;
+  color: #d9d3e7;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.history-item-meta {
+  margin-top: 5px;
+  color: #716a80;
+  font-size: 11px;
+}
+
+@keyframes historyOverlayIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes historyPanelIn {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 520px) {
+  .history-panel {
+    width: 100%;
+  }
+}
