@@ -1153,21 +1153,33 @@ button {
 
 .history-item {
   width: 100%;
-  display: block;
-  text-align: left;
-  padding: 15px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 8px;
+  padding: 0;
   border: 1px solid transparent;
   border-radius: 14px;
   background: transparent;
-  color: inherit;
-  cursor: pointer;
   transition: 0.2s ease;
 }
 
-.history-item:hover {
+.history-item:hover,
+.history-item.active {
   background: rgba(255, 255, 255, 0.045);
   border-color: rgba(255, 255, 255, 0.07);
+}
+
+.history-item-main {
+  min-width: 0;
+  flex: 1;
+  display: block;
+  text-align: left;
+  padding: 15px 8px 15px 16px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
 }
 
 .history-item-title {
@@ -1184,6 +1196,32 @@ button {
   margin-top: 5px;
   color: #716a80;
   font-size: 11px;
+}
+
+.history-delete {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  margin-right: 8px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #716a80;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: 0.2s ease;
+}
+
+.history-item:hover .history-delete,
+.history-item.active .history-delete {
+  opacity: 1;
+}
+
+.history-delete:hover {
+  background: rgba(255, 80, 100, 0.12);
+  color: #ff8293;
 }
 
 @keyframes historyOverlayIn {
