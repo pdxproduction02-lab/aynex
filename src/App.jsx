@@ -200,11 +200,20 @@ function MarkdownContent({ content }) {
 
 /* ---------- Typing Effect ---------- */
 
-function TypingMessage({ content }) {
-  const [visibleText, setVisibleText] = useState("");
-  const [isFinished, setIsFinished] = useState(false);
+function TypingMessage({ content, animate = false }) {
+  const [visibleText, setVisibleText] = useState(
+    animate ? "" : content
+  );
+
+  const [isFinished, setIsFinished] = useState(!animate);
 
   useEffect(() => {
+    if (!animate) {
+      setVisibleText(content);
+      setIsFinished(true);
+      return;
+    }
+
     setVisibleText("");
     setIsFinished(false);
 
@@ -222,13 +231,13 @@ function TypingMessage({ content }) {
     }, 12);
 
     return () => clearInterval(interval);
-  }, [content]);
+  }, [content, animate]);
 
   return (
     <>
       <MarkdownContent content={visibleText} />
 
-      {!isFinished && (
+      {animate && !isFinished && (
         <span className="typing-cursor" />
       )}
     </>
@@ -248,6 +257,7 @@ const [activeConversationId, setActiveConversationId] = useState(null);
 const [isThinking, setIsThinking] = useState(false);
 const [error, setError] = useState("");
 const [copiedIndex, setCopiedIndex] = useState(null);
+  const [typingMessageIndex, setTypingMessageIndex] = useState(null);
 
   const chatEndRef = useRef(null);
 
@@ -354,14 +364,15 @@ useEffect(() => {
       }
 
       const finalMessages = [
-        ...updatedMessages,
-        {
-          role: "model",
-          content: data.message,
-        },
-      ];
+  ...updatedMessages,
+  {
+    role: "model",
+    content: data.message,
+  },
+];
 
-      setMessages(finalMessages);
+setTypingMessageIndex(finalMessages.length - 1);
+setMessages(finalMessages);
     } catch (err) {
       console.error("AYNEX chat error:", err);
 
@@ -378,6 +389,7 @@ const openConversation = (conversation) => {
   setInput("");
   setError("");
   setCopiedIndex(null);
+  setTypingMessageIndex(null);
   setIsHistoryOpen(false);
 };
   const deleteConversation = (conversationId) => {
@@ -424,6 +436,7 @@ const openConversation = (conversation) => {
   setInput("");
   setError("");
   setCopiedIndex(null);
+    setTypingMessageIndex(null);
 };
 
   const copyAnswer = async (content, index) => {
@@ -620,10 +633,13 @@ const openConversation = (conversation) => {
 
                   <div className="message-text">
                     {message.role === "user" ? (
-                      <p>{message.content}</p>
-                    ) : (
-                      <TypingMessage content={message.content} />
-                    )}
+  <p>{message.content}</p>
+) : (
+  <TypingMessage
+    content={message.content}
+    animate={typingMessageIndex === index}
+  />
+)}
                   </div>
 
                   {message.role === "model" && (
