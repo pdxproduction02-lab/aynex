@@ -411,6 +411,19 @@ const openConversation = (conversation) => {
     setCopiedIndex(null);
   }
 };
+  const clearAllHistory = () => {
+  if (!window.confirm("Clear all conversation history?")) return;
+
+  localStorage.removeItem(STORAGE_KEY);
+  setConversations([]);
+  setActiveConversationId(null);
+  setMessages([]);
+  setInput("");
+  setError("");
+  setCopiedIndex(null);
+  setTypingMessageIndex(null);
+  setIsHistoryOpen(false);
+};
   const startNewChat = () => {
   const newConversation = {
     id: crypto.randomUUID(),
@@ -502,6 +515,13 @@ const openConversation = (conversation) => {
         {conversation.messages?.length || 0} messages
       </div>
     </button>
+    <button
+  className="clear-history-button"
+  type="button"
+  onClick={clearAllHistory}
+>
+  Clear all history
+</button>
 
     <button
       className="history-delete"
