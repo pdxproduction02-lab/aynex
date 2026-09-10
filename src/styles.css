@@ -1249,3 +1249,18 @@ button {
     width: 100%;
   }
 }
+.clear-history-button {
+  margin-top: 16px;
+  padding: 9px 12px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 9px;
+  background: transparent;
+  color: #8d849c;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.clear-history-button:hover {
+  color: #ff8293;
+  border-color: rgba(255,80,100,.2);
+}
