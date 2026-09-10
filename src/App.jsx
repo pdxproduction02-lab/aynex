@@ -257,6 +257,13 @@ function formatTime(timestamp) {
 
   return new Date(timestamp).toLocaleDateString();
 }
+function generateTitle(text) {
+  return text
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/[.!?]+$/, "")
+    .slice(0, 45);
+}
 
 /* ---------- Main App ---------- */
 
@@ -327,7 +334,7 @@ useEffect(() => {
 
       const newConversation = {
         id: conversationId,
-        title: text.slice(0, 40),
+        title: generateTitle(text),
         messages: updatedMessages,
         createdAt: Date.now(),
         updatedAt: Date.now(),
