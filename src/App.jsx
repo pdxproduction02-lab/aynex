@@ -280,6 +280,8 @@ const [isThinking, setIsThinking] = useState(false);
 const [error, setError] = useState("");
 const [copiedIndex, setCopiedIndex] = useState(null);
   const [typingMessageIndex, setTypingMessageIndex] = useState(null);
+  const [modal, setModal] = useState(null);
+const [renameText, setRenameText] = useState("");
 
   const chatEndRef = useRef(null);
 
@@ -449,22 +451,16 @@ const openConversation = (conversation) => {
 
   if (!conversation) return;
 
-  const newTitle = window.prompt(
-    "Rename conversation:",
-    conversation.title || ""
-  );
-
-  if (!newTitle?.trim()) return;
-
-  setConversations((current) => {
-    const updated = current.map((item) =>
-      item.id === conversationId
-        ? { ...item, title: newTitle.trim(), updatedAt: Date.now() }
-        : item
-    );
-
-    saveConversations(updated);
-    return updated;
+  setRenameText(conversation.title || "");
+  setModal({
+    type: "rename",
+    id: conversationId,
+  });
+};
+  const confirmDelete = (conversationId) => {
+  setModal({
+    type: "delete",
+    id: conversationId,
   });
 };
   const startNewChat = () => {
@@ -508,9 +504,100 @@ const openConversation = (conversation) => {
       console.error("Copy failed:", err);
     }
   };
+  const handleModalAction = () => {
+  if (!modal) return;
+
+  if (modal.type === "rename") {
+    const title = renameText.trim();
+
+    if (!title) return;
+
+    setConversations((current) => {
+      const updated = current.map((item) =>
+        item.id === modal.id
+          ? { ...item, title, updatedAt: Date.now() }
+          : item
+      );
+
+      saveConversations(updated);
+      return updated;
+    });
+  }
+
+  if (modal.type === "delete") {
+    deleteConversation(modal.id);
+  }
+
+  setModal(null);
+};
 
   return (
     <div className="app">
+      {modal && (
+  <div
+    className="aynex-modal-overlay"
+    onClick={() => setModal(null)}
+  >
+    <div
+      className="aynex-modal"
+      onClick={(event) => event.stopPropagation()}
+    >
+      <div className="aynex-modal-icon">
+        {modal.type === "rename" ? "✦" : "!"}
+      </div>
+
+      <div className="aynex-modal-eyebrow">
+        {modal.type === "rename" ? "CONVERSATION" : "WARNING"}
+      </div>
+
+      <h3>
+        {modal.type === "rename"
+          ? "Rename conversation"
+          : "Delete conversation?"}
+      </h3>
+
+      {modal.type === "rename" ? (
+        <input
+          className="aynex-modal-input"
+          value={renameText}
+          onChange={(event) => setRenameText(event.target.value)}
+          autoFocus
+          maxLength={60}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              handleModalAction();
+            }
+          }}
+        />
+      ) : (
+        <p className="aynex-modal-description">
+          This conversation will be permanently removed from
+          your local history.
+        </p>
+      )}
+
+      <div className="aynex-modal-actions">
+        <button
+          className="aynex-modal-cancel"
+          type="button"
+          onClick={() => setModal(null)}
+        >
+          Cancel
+        </button>
+
+        <button
+          className={`aynex-modal-confirm ${
+            modal.type === "delete" ? "danger" : ""
+          }`}
+          type="button"
+          onClick={handleModalAction}
+        >
+          {modal.type === "rename" ? "Save" : "Delete"}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       <div className="ambient-glow" />{isHistoryOpen && (
   <div className="history-overlay">
     <aside className="history-panel">
@@ -575,7 +662,7 @@ const openConversation = (conversation) => {
       aria-label={`Delete ${
         conversation.title || "conversation"
       }`}
-      onClick={() => deleteConversation(conversation.id)}
+      onClick={() => confirmDelete(conversation.id)}
     >
       <Trash2 size={15} />
     </button>
