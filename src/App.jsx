@@ -10,6 +10,7 @@ import {
   Check,
   Clock3,
   Trash2,
+  Pencil,
   X,
 } from "lucide-react";
 const STORAGE_KEY = "aynex_conversations";
@@ -441,6 +442,31 @@ const openConversation = (conversation) => {
   setTypingMessageIndex(null);
   setIsHistoryOpen(false);
 };
+  const renameConversation = (conversationId) => {
+  const conversation = conversations.find(
+    (item) => item.id === conversationId
+  );
+
+  if (!conversation) return;
+
+  const newTitle = window.prompt(
+    "Rename conversation:",
+    conversation.title || ""
+  );
+
+  if (!newTitle?.trim()) return;
+
+  setConversations((current) => {
+    const updated = current.map((item) =>
+      item.id === conversationId
+        ? { ...item, title: newTitle.trim(), updatedAt: Date.now() }
+        : item
+    );
+
+    saveConversations(updated);
+    return updated;
+  });
+};
   const startNewChat = () => {
   const newConversation = {
     id: crypto.randomUUID(),
@@ -530,16 +556,18 @@ const openConversation = (conversation) => {
 
       <div className="history-item-meta">
         {conversation.messages?.length || 0} messages ·{" "}
-{formatTime(conversation.updatedAt || conversation.createdAt)}
+        {formatTime(conversation.updatedAt || conversation.createdAt)}
       </div>
     </button>
+
     <button
-  className="clear-history-button"
-  type="button"
-  onClick={clearAllHistory}
->
-  Clear all history
-</button>
+      className="history-rename"
+      type="button"
+      aria-label="Rename conversation"
+      onClick={() => renameConversation(conversation.id)}
+    >
+      <Pencil size={15} />
+    </button>
 
     <button
       className="history-delete"
@@ -558,7 +586,13 @@ const openConversation = (conversation) => {
     </aside>
   </div>
 )}
-
+<button
+  className="clear-history-button"
+  type="button"
+  onClick={clearAllHistory}
+>
+  Clear all history
+</button>
       <header className="topbar">
         <div className="brand">
           <AynexMark small />
